@@ -1,0 +1,82 @@
+const express = require("express")
+const router = express.Router();
+const wrapAsync = require("../utils/wrapAsync.js")
+const Listing = require("../models/listing.js")
+const ExpressError = require("../utils/expressError.js")
+const { listingSchema } = require("../schema.js")
+
+const DEFAULT_IMAGE_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVC8jngnWMbM9Xc4Nvf-lDhb5W5hzpPQvRB4F6pQDYPg&s=10";
+
+const useDefaultImageWhenBlank = (listing) => {
+    if (!listing.image?.url?.trim()) {
+        listing.image = { url: DEFAULT_IMAGE_URL };
+    }
+};
+
+const validateListing = (req, res , next) => {
+    let { error } = listingSchema.validate(req.body);
+    // console.log(result)
+    if (error) {
+        let errMsg = error.details.map((el)=>el.message).join(',')
+        throw new ExpressError(400, errMsg)
+    }else{
+        next()
+    }
+}
+
+
+//index route
+router.get("/", wrapAsync(async (req, res) => {
+    const listing = await Listing.find({})
+    res.render("listing/index.ejs", { listing })
+}))
+
+//create new route
+router.get("/new", (req, res) => {
+    res.render("listing/new.ejs")
+})
+
+//create route
+router.post("/", validateListing, wrapAsync(async (req, res, next) => {
+    // let {title , description , image , price , country , location} = req.body;
+
+    useDefaultImageWhenBlank(req.body.listing);
+    const newListing = new Listing(req.body.listing)
+    await newListing.save();
+    res.redirect('/listing')
+}))
+
+//show route
+router.get('/:id', wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    let place = await Listing.findById(id).populate("reviews");
+    // console.log(place)
+    res.render("listing/show.ejs", { place });
+}))
+
+//edit route
+router.get("/:id/edit", wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    let place = await Listing.findById(id);
+    res.render("listing/edit", { place })
+}))
+
+//update route
+router.put("/:id",wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    useDefaultImageWhenBlank(req.body.listing);
+    await Listing.findByIdAndUpdate(id, { ...req.body.listing })
+    res.redirect(`/listing`)
+}))
+
+// delete post route route
+router.delete("/:id/", wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    let deleted = await Listing.findByIdAndDelete(id)
+    // console.log(deleted)
+    res.redirect("/listing")
+}))
+
+
+
+module.exports = router;
