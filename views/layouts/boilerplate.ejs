@@ -16,7 +16,9 @@
 
 <body>
     <%- include("../includes/navbar.ejs") %>
+
         <div class="container">
+            <%- include("../includes/flash.ejs") %>
             <%- body %>
         </div>
         <%- include("../includes/footer.ejs") %>
@@ -26,6 +28,10 @@
                 crossorigin="anonymous"></script>
 
             <script src="/js/script.js"></script>
+
+
 </body>
+
+
 
 </html>

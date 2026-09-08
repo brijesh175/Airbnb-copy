@@ -19,17 +19,21 @@ const listingSchema = new Schema({
     price: Number,
     location: String,
     country: String,
-    reviews : [
+    reviews: [
         {
-            type:Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "review",
         }
-    ]
+    ],
+    owner: {
+        type:Schema.Types.ObjectId,
+        ref:"User"
+    }
 })
 
-listingSchema.post("findOneAndDelete" , async( Listing )=>{
-    if(Listing){
-        await review.deleteMany({_id : {$in: Listing.reviews}})
+listingSchema.post("findOneAndDelete", async (Listing) => {
+    if (Listing) {
+        await review.deleteMany({ _id: { $in: Listing.reviews } })
     }
 })
 

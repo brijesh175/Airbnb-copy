@@ -1,0 +1,32 @@
+<% layout("/layouts/boilerplate") %>
+
+    <body>
+        <div class="col-6 offset-3 form">
+            <h2>SignUp</h2>
+
+            <form action="/signup" method="POST" class="row g-3 needs-validation mt-2" novalidate  >
+                <div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                        <label for="floatingInput">Email address</label>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">@</span>
+                        <div class="form-floating">
+                            <input type="text" name="username" class="form-control" id="username" placeholder="Username" required>
+                            <label for="floatingInputGroup1">Username</label>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        <label for="floatingPassword">Password</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="number" class="form-control" id="age" name="age" placeholder="age" required>
+                        <label for="floatingPassword">age</label>
+                    </div>
+                </div>
+            <button class="btn btn-primary">SignUp</button>
+            </form>
+        </div>
+    </body>
