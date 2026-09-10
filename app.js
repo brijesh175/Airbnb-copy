@@ -82,6 +82,7 @@ app.all("/{*splat}", (req, res, next) => {
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = 'something is wrong from defauly' } = err;
     res.status(statusCode).send(message);
+    next();
 })
 
 app.listen("8080", () => {

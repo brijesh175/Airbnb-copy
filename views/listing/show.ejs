@@ -29,53 +29,63 @@
                 <li class="list-group-item">&#8377 <%= place.price.toLocaleString("en-IN") %>/nigth</li>
             </ul>
             <br>
-            <div id="show-btns">
-                <a href="/listing/<%=place._id %>/edit" class="btn btn-warning">Edit this post</a>
-                <form action="/listing/<%=place._id%>?_method=DELETE" method="post">
-                    <button class="btn btn-danger">delete</button>
-                </form>
-            </div>
-            <hr>
-            <div>
-                <h4>Leave a review</h4>
-                <form action="/listing/<%=place.id%>/reviews" method="post" class="row g-3 needs-validation" novalidate>
-                    <div>
-                        <label for="Rating" class="form-label">Rating</label>
-                        <input type="range" min="1" max="5" id="rating" name="review[rating]">
-                    </div>
-                    <div class="has-validation">
-                        <label for="comment" class="form-label">Comment</label>
-                        <textarea name="review[comment]" id="comment" rows="5" cols="60"
-                            placeholder="add your review here" class="form-control" required></textarea>
-                        <div class="invalid-feedback">
-                            write somthing before submit bkl.
-                        </div>
-                    </div>
-                    <br>
-                    <div class=" col-12">
-                        <button class="btn btn-outline-dark">Submit</button>
-                    </div>
-
-                </form>
-                <hr>
-                <h4>All review</h4>
-                <div class="row">
-                    <% for(review of place.reviews){ %>
-                        <div class="card card-body ms-3 mb-3 col-5">
-                            <p class="card-text">
-                                <%= review.comment %>
-                            </p>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">Rating :-<%=review.rating %>Stars</h6>
-                            <form method="post" action="/listing/<%=place._id%>/reviews/<%=review._id%>?_method=DELETE"
-                                class="mb-3 ml-10">
-                                <button class="btn btn-sm btn-dark">delete</button>
-                            </form>
-                        </div>
-                        <% } %>
+            <% if(curruser && place.owner._id.equals(curruser._id)){ %>
+                <div id="show-btns">
+                    <a href="/listing/<%=place._id %>/edit" class="btn btn-warning">Edit this post</a>
+                    <form action="/listing/<%=place._id%>?_method=DELETE" method="post">
+                        <button class="btn btn-danger">delete</button>
+                    </form>
                 </div>
-            </div>
+                <% } %>
 
-            <br><br><br><br><br>
-            <br><br><br><br><br>
+                    <hr>
+                    <% if(curruser){ %>
+                        <div>
+                            <h4>Leave a review</h4>
+                            <form action="/listing/<%=place.id%>/reviews" method="post" class="row g-3 needs-validation"
+                                novalidate>
+                                <div>
+                                    <label for="Rating" class="form-label">Rating</label>
+                                    <input type="range" min="1" max="5" id="rating" name="review[rating]">
+                                </div>
+                                <div class="has-validation">
+                                    <label for="comment" class="form-label">Comment</label>
+                                    <textarea name="review[comment]" id="comment" rows="5" cols="60"
+                                        placeholder="add your review here" class="form-control" required></textarea>
+                                    <div class="invalid-feedback">
+                                        write somthing before submit bkl.
+                                    </div>
+                                </div>
+                                <br>
+                                <div class=" col-12">
+                                    <button class="btn btn-outline-dark">Submit</button>
+                                </div>
+
+                            </form>
+                            <% } %>
+                                <hr>
+                                <h4>All review</h4>
+                                <div class="row">
+                                    <% for(review of place.reviews){ %>
+                                        
+                                        <div class="card card-body ms-3 mb-3 col-5">
+                                            <p class="card-title"> @<%= review.author.username %></p>
+                                            <p class="card-text">
+                                                <%= review.comment %>
+                                            </p>
+                                            <h6 class="card-subtitle mb-2 text-body-secondary">Rating :-<%=review.rating
+                                                    %>Stars</h6>
+                                            <form method="post"
+                                                action="/listing/<%=place._id%>/reviews/<%=review._id%>?_method=DELETE"
+                                                class="mb-3 ml-10">
+                                                <button class="btn btn-sm btn-dark">delete</button>
+                                            </form>
+                                        </div>
+                                        <% } %>
+                                </div>
+                        </div>
+
+                        <br><br><br><br><br>
+                        <br><br><br><br><br>
         </div>
     </body>
