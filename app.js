@@ -44,7 +44,7 @@ async function main() {
     app.listen(port, () => console.log(`server is listening on ${port}`));
 }
 
-const st ore = MongoStore.create({
+const store = MongoStore.create({
     mongoUrl: process.env.MONGO_URL,
     crypto:{
         secret : process.env.MONGO_URL,
