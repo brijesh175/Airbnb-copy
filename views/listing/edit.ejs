@@ -3,7 +3,7 @@
     <body>
         <h2>edit post</h2>
         <div class="col-6 offset-2">
-            <form method="post" action="/listing/<%=place._id%>?_method=PUT" class="row g-3 needs-validation">
+            <form method="post" action="/listing/<%=place._id%>?_method=PUT" class="row g-3 needs-validation" enctype="multipart/form-data">
 
                 <div>
                     <label for="title" class="form-label">Title</label>
@@ -23,8 +23,8 @@
                 </div>
 
                 <div>
-                    <label for="image" class="form-label">image</label>
-                    <input type="text" name="listing[image][url]" value="<%=place.image.url %>" class="form-control">
+                    <label for="image" class="form-label">Upload new image</label>
+                    <input type="file" name="listing[image]" class="form-control">
 
                 </div>
 

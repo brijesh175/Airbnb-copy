@@ -10,11 +10,8 @@ const listingSchema = new Schema({
     },
     description: String,
     image: {
-        filename: String,
-        url: {
-            type: String,
-            default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVC8jngnWMbM9Xc4Nvf-lDhb5W5hzpPQvRB4F6pQDYPg&s=10",
-        },
+        url: String,
+        filename:String,
     },
     price: Number,
     location: String,

@@ -1,3 +1,6 @@
+require('dotenv').config()
+// console.log(process.env)
+
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require('path')
@@ -5,6 +8,7 @@ const methodOverride = require('method-override');
 const ejsMat = require("ejs-mate");
 const ExpressError = require("./utils/expressError.js");
 const session = require('express-session')
+const { MongoStore } = require("connect-mongo");
 const listingRouter = require("./routs/listing.js")
 const reviewRouter = require("./routs/reviews.js")
 const userRouter = require("./routs/user.js")
@@ -21,21 +25,45 @@ app.use(methodOverride("_method"));
 app.engine('ejs', ejsMat);
 app.use(express.static(path.join(__dirname, "/public")));
 
-main().then(() => console.log('DB working'))
-    .catch(err => console.log(err));
+main().catch(err => {
+    console.error('Application startup failed:', err.message);
+    process.exit(1);
+});
 
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
+    const mongoUrl = process.env.MONGO_URL;
+    if (!mongoUrl) {
+        throw new Error('MONGO_URL is missing. Set it in .env using your rotated MongoDB Atlas connection string.');
+    }
+    if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+        throw new Error('SESSION_SECRET is required in production.');
+    }
+    await mongoose.connect(mongoUrl);
+    console.log('DB working');
+    const port = process.env.PORT || 8080;
+    app.listen(port, () => console.log(`server is listening on ${port}`));
 }
 
+const st ore = MongoStore.create({
+    mongoUrl: process.env.MONGO_URL,
+    crypto:{
+        secret : process.env.MONGO_URL,
+    },
+    touchAfter: 24 * 3600,
+})
+store.on("error" , () => {
+    console.log("ERROR in mongo session store , error")
+})
+
 app.use(session({
-    secret: 'this is secretecode',
+    store,
+    secret: process.env.SESSION_SECRET || 'development-only-change-me',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
+        sameSite: 'lax',
     }
 }))
 app.use(flash());                                   // alwase use this before routs
@@ -78,13 +106,11 @@ app.all("/{*splat}", (req, res, next) => {
     next(new ExpressError(404, 'page not found!!!'))
 })
 
-// //CUSTOM ERROR HANDALING
+//CUSTOM ERROR HANDALING
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = 'something is wrong from defauly' } = err;
+    if (res.headersSent) return next(err);
     res.status(statusCode).send(message);
-    next();
 })
 
-app.listen("8080", () => {
-    console.log("server is listing to 8080")
-})
+ 
