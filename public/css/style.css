@@ -96,3 +96,60 @@ form{
     display: inline-block;
     margin-left: 5em;
 }
+
+/* Scoped Search, Filter & Sort Styling */
+.filter-form,
+.navbar-search-form {
+    display: block !important;
+    margin-left: 0 !important;
+}
+
+.search-filter-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+    transition: box-shadow 0.2s ease;
+}
+
+.search-filter-card:focus-within {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.search-filter-card .form-control:focus,
+.search-filter-card .form-select:focus {
+    border-color: #fe424d;
+    box-shadow: 0 0 0 0.2rem rgba(254, 66, 77, 0.15);
+}
+
+.navbar-search-form .form-control {
+    min-width: 180px;
+    border-color: #dee2e6;
+}
+
+.navbar-search-form .form-control:focus {
+    border-color: #fe424d;
+    box-shadow: 0 0 0 0.15rem rgba(254, 66, 77, 0.2);
+}
+
+.empty-state-box {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.active-chips .badge {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4em 0.7em;
+}
+
+.card1 {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card1:hover {
+    transform: translateY(-4px);
+    scale: 1 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+

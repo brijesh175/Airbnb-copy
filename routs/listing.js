@@ -1,11 +1,7 @@
 const express = require("express")
-const mongoose = require("mongoose")
 const router = express.Router();
-exports.router = router;
 const wrapAsync = require("../utils/wrapAsync.js")
-const Listing = require("../models/listing.js")
-const ExpressError = require("../utils/expressError.js")
-const { listingSchema } = require("../schema.js")
+
 const {isloggedIn , isOwner , validateListing} = require("../middlewere.js")
 const multer  = require('multer')
 const {storage} = require("../cloudConfig.js")
@@ -22,7 +18,7 @@ router.route("/")
         isloggedIn,
         upload.single("listing[image]"),
         validateListing,
-        listingController.createnew 
+        listingController.createnew
     )
 //create new route
 router.get("/new",isloggedIn, listingController.renderNewform)

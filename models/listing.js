@@ -1,4 +1,3 @@
-const express = require("express");
 const mongoose = require("mongoose");
 const review = require('./review.js')
 const Schema = mongoose.Schema;
@@ -26,7 +25,11 @@ const listingSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:"User"
     }
-})
+}, { timestamps: true });
+
+listingSchema.index({ price: 1 });
+listingSchema.index({ location: 1 });
+listingSchema.index({ country: 1 });
 
 listingSchema.post("findOneAndDelete", async (Listing) => {
     if (Listing) {

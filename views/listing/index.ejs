@@ -1,35 +1,232 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>show all docs</title>
-    <style>
-        img{
-            width: 200px;
-        }
-    </style>
-</head> -->
-
 <% layout("/layouts/boilerplate") %>
 
-    <body>
-        <h2>all listing</h2>
-        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1"> 
-            <% for(list of listing){ %>
-               <a href="/listing/<%=list._id %>" class="show-link">
-                 <div class="card card1">
-                    <img src="<%=list.image.url%>" class="card-img-top pics" alt="image of place">
+<div class="listing-index-container mt-3 mb-5">
+    <% if (typeof priceWarning !== 'undefined' && priceWarning) { %>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i><%= priceWarning %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+
+    <!-- Search, Filter & Sort Bar -->
+    <div class="search-filter-card shadow-sm rounded-4 p-3 mb-4 bg-white border">
+        <form action="/listing" method="GET" class="filter-form m-0" id="filterForm">
+            <!-- Top row: Main Search & Sort -->
+            <div class="row g-2 align-items-center mb-3">
+                <div class="col-12 col-md-7 col-lg-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            name="search" 
+                            id="searchInput" 
+                            class="form-control border-start-0 ps-0" 
+                            placeholder="Search by title, location, or country..." 
+                            value="<%= (typeof filters !== 'undefined' && filters.search) ? filters.search : '' %>"
+                            autocomplete="off"
+                        >
+                        <% if (typeof filters !== 'undefined' && filters.search) { %>
+                            <a href="/listing" class="btn btn-outline-secondary border-start-0 border-end-0 d-flex align-items-center" id="clearSearchBtn" title="Clear search">
+                                <i class="fa-solid fa-xmark"></i>
+                            </a>
+                        <% } %>
+                        <button class="btn btn-danger px-4" type="submit">
+                            <i class="fa-solid fa-magnifying-glass me-1 d-none d-sm-inline"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sort Dropdown -->
+                <div class="col-12 col-md-5 col-lg-4">
+                    <div class="input-group">
+                        <label class="input-group-text bg-light" for="sortSelect">
+                            <i class="fa-solid fa-arrow-down-short-wide me-1 text-muted"></i>Sort
+                        </label>
+                        <select name="sort" id="sortSelect" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                            <option value="recommended" <%= (typeof filters !== 'undefined' && filters.sort === 'recommended') ? 'selected' : '' %>>Recommended</option>
+                            <option value="price_asc" <%= (typeof filters !== 'undefined' && filters.sort === 'price_asc') ? 'selected' : '' %>>Price: Low to High</option>
+                            <option value="price_desc" <%= (typeof filters !== 'undefined' && filters.sort === 'price_desc') ? 'selected' : '' %>>Price: High to Low</option>
+                            <option value="newest" <%= (typeof filters !== 'undefined' && filters.sort === 'newest') ? 'selected' : '' %>>Newest First</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Controls Collapsible / Responsive Grid -->
+            <div class="row g-2 align-items-end pt-2 border-top">
+                <!-- Location Filter -->
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label for="locationInput" class="form-label form-label-sm mb-1 fw-semibold text-secondary">
+                        <i class="fa-solid fa-location-dot me-1 text-danger"></i>Location / City
+                    </label>
+                    <input 
+                        type="text" 
+                        name="location" 
+                        id="locationInput" 
+                        class="form-control form-control-sm" 
+                        placeholder="e.g. Malibu, Paris" 
+                        value="<%= (typeof filters !== 'undefined' && filters.location) ? filters.location : '' %>"
+                    >
+                </div>
+
+                <!-- Country Filter -->
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label for="countrySelect" class="form-label form-label-sm mb-1 fw-semibold text-secondary">
+                        <i class="fa-solid fa-globe me-1 text-primary"></i>Country
+                    </label>
+                    <select name="country" id="countrySelect" class="form-select form-select-sm">
+                        <option value="">All Countries</option>
+                        <% if (typeof countries !== 'undefined' && countries.length) { %>
+                            <% for (let c of countries) { %>
+                                <option value="<%= c %>" <%= (typeof filters !== 'undefined' && filters.country === c) ? 'selected' : '' %>><%= c %></option>
+                            <% } %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <!-- Min Price -->
+                <div class="col-6 col-sm-6 col-md-2">
+                    <label for="minPriceInput" class="form-label form-label-sm mb-1 fw-semibold text-secondary">
+                        <i class="fa-solid fa-indian-rupee-sign me-1 text-success"></i>Min Price
+                    </label>
+                    <input 
+                        type="number" 
+                        name="minPrice" 
+                        id="minPriceInput" 
+                        class="form-control form-control-sm" 
+                        placeholder="₹ Min" 
+                        min="0" 
+                        step="100" 
+                        value="<%= (typeof filters !== 'undefined' && filters.minPrice) ? filters.minPrice : '' %>"
+                    >
+                </div>
+
+                <!-- Max Price -->
+                <div class="col-6 col-sm-6 col-md-2">
+                    <label for="maxPriceInput" class="form-label form-label-sm mb-1 fw-semibold text-secondary">
+                        <i class="fa-solid fa-indian-rupee-sign me-1 text-success"></i>Max Price
+                    </label>
+                    <input 
+                        type="number" 
+                        name="maxPrice" 
+                        id="maxPriceInput" 
+                        class="form-control form-control-sm" 
+                        placeholder="₹ Max" 
+                        min="0" 
+                        step="100" 
+                        value="<%= (typeof filters !== 'undefined' && filters.maxPrice) ? filters.maxPrice : '' %>"
+                    >
+                </div>
+
+                <!-- Actions: Apply & Clear -->
+                <div class="col-12 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-dark btn-sm flex-fill">
+                        Apply
+                    </button>
+                    <% if (typeof activeFilterCount !== 'undefined' && activeFilterCount > 0) { %>
+                        <a href="/listing" class="btn btn-outline-secondary btn-sm flex-fill text-nowrap" title="Reset all filters">
+                            Clear
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Status Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div class="results-heading">
+            <h5 class="fw-bold mb-1">
+                <% if (typeof activeFilterCount !== 'undefined' && activeFilterCount > 0) { %>
+                    <%= resultsCount %> <%= resultsCount === 1 ? 'listing' : 'listings' %> found
+                    <span class="text-muted fs-6 fw-normal">(out of <%= totalCount %> total)</span>
+                <% } else { %>
+                    All Listings <span class="text-muted fs-6 fw-normal">(<%= typeof totalCount !== 'undefined' ? totalCount : (listing ? listing.length : 0) %> total)</span>
+                <% } %>
+            </h5>
+        </div>
+
+        <% if (typeof activeFilterCount !== 'undefined' && activeFilterCount > 0) { %>
+            <div class="active-chips d-flex flex-wrap gap-1 align-items-center">
+                <span class="text-muted small me-1">Active filters:</span>
+                <% if (filters.search) { %>
+                    <span class="badge bg-light text-dark border">
+                        Keyword: "<%= filters.search %>"
+                    </span>
+                <% } %>
+                <% if (filters.location) { %>
+                    <span class="badge bg-light text-dark border">
+                        Location: <%= filters.location %>
+                    </span>
+                <% } %>
+                <% if (filters.country) { %>
+                    <span class="badge bg-light text-dark border">
+                        Country: <%= filters.country %>
+                    </span>
+                <% } %>
+                <% if (filters.minPrice) { %>
+                    <span class="badge bg-light text-dark border">
+                        Min: &#8377;<%= Number(filters.minPrice).toLocaleString("en-IN") %>
+                    </span>
+                <% } %>
+                <% if (filters.maxPrice) { %>
+                    <span class="badge bg-light text-dark border">
+                        Max: &#8377;<%= Number(filters.maxPrice).toLocaleString("en-IN") %>
+                    </span>
+                <% } %>
+                <% if (filters.sort && filters.sort !== 'recommended') { %>
+                    <span class="badge bg-light text-dark border">
+                        Sort: <%= filters.sort.replace('_', ' ') %>
+                    </span>
+                <% } %>
+                <a href="/listing" class="badge bg-danger text-white text-decoration-none ms-1">
+                    <i class="fa-solid fa-xmark me-1"></i>Clear all
+                </a>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Listings Grid or Empty State -->
+    <% if (listing && listing.length > 0) { %>
+        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4"> 
+            <% for (let list of listing) { %>
+               <a href="/listing/<%= list._id %>" class="show-link text-decoration-none">
+                 <div class="card card1 h-100 shadow-sm border-0">
+                    <img src="<%= (list.image && list.image.url) ? list.image.url : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVC8jngnWMbM9Xc4Nvf-lDhb5W5hzpPQvRB4F6pQDYPg&s=10' %>" class="card-img-top pics" alt="<%= list.title %>">
                     <div class="card-img-overlay"></div>
-                    <div class="card-body">
-                        <h6 class="card-title">
-                            <%=list.title %>
+                    <div class="card-body pt-2 pb-2">
+                        <h6 class="card-title fw-bold text-dark text-truncate mb-1">
+                            <%= list.title %>
                         </h6>
-                        <p class="card-text">&#8377 <%= list.price.toLocaleString("en-IN") %> /night</p>
+                        <p class="card-subtitle text-muted small mb-2 text-truncate">
+                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><%= list.location || '' %><% if (list.location && list.country) { %>, <% } %><%= list.country || '' %>
+                        </p>
+                        <p class="card-text text-dark fw-semibold mb-0">
+                            &#8377; <%= (typeof list.price === 'number') ? list.price.toLocaleString("en-IN") : 'N/A' %> 
+                            <span class="text-muted fw-normal">/ night</span>
+                        </p>
                     </div>
                 </div>
                </a>
-                <% } %>
+            <% } %>
         </div>
-    </body>
+    <% } else { %>
+        <!-- Empty State -->
+        <div class="empty-state-box text-center py-5 px-3 my-4 bg-white rounded-4 border shadow-sm">
+            <div class="empty-state-icon mb-3">
+                <i class="fa-solid fa-compass-drafting fa-3x text-danger opacity-75"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No listings found</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 480px;">
+                We couldn't find any listings matching your search or filter criteria. Try adjusting your keywords, expanding your price range, or clearing active filters.
+            </p>
+            <div class="d-flex justify-content-center gap-2">
+                <a href="/listing" class="btn btn-danger px-4 py-2">
+                    <i class="fa-solid fa-rotate-left me-2"></i>Reset All Filters
+                </a>
+            </div>
+        </div>
+    <% } %>
+</div>

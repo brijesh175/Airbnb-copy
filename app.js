@@ -7,7 +7,7 @@ const path = require('path')
 const methodOverride = require('method-override');
 const ejsMat = require("ejs-mate");
 const ExpressError = require("./utils/expressError.js");
-const session = require('express-session')
+const session = require('express-session');
 const { MongoStore } = require("connect-mongo");
 const listingRouter = require("./routs/listing.js")
 const reviewRouter = require("./routs/reviews.js")
@@ -51,8 +51,8 @@ const store = MongoStore.create({
     },
     touchAfter: 24 * 3600,
 })
-store.on("error" , () => {
-    console.log("ERROR in mongo session store , error")
+store.on("error" , (err) => {
+    console.log("ERROR in mongo session store:", err)
 })
 
 app.use(session({
@@ -106,11 +106,11 @@ app.all("/{*splat}", (req, res, next) => {
     next(new ExpressError(404, 'page not found!!!'))
 })
 
-//CUSTOM ERROR HANDALING
+//CUSTOM ERROR HANDLING
 app.use((err, req, res, next) => {
-    let { statusCode = 500, message = 'something is wrong from defauly' } = err;
+    let { statusCode = 500, message = 'something went wrong' } = err;
     if (res.headersSent) return next(err);
-    res.status(statusCode).send(message);
+    res.status(statusCode).render("error.ejs", { message });
 })
 
  

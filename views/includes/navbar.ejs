@@ -6,11 +6,17 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
+            <div class="navbar-nav me-auto">
                 <a class="nav-link active" aria-current="page" href="/listing">Home</a>
                 <a class="nav-link" href="/listing">all listing</a>
                 <a class="nav-link" href="/listing/new">add new listing</a>
             </div>
+            <form class="d-flex navbar-search-form my-2 my-md-0 me-md-3" action="/listing" method="GET" role="search">
+                <div class="input-group input-group-sm">
+                    <input class="form-control rounded-start-pill ps-3" type="search" name="search" placeholder="Search destinations..." aria-label="Search" value="<%= (typeof filters !== 'undefined' && filters && filters.search) ? filters.search : '' %>">
+                    <button class="btn btn-danger rounded-end-pill px-3" type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </form>
         </div>
         <% if(!curruser){ %>
             <a href="/login" class="btn">login</a>

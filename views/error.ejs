@@ -1,13 +1,11 @@
-import Joi from 'joi';
+<% layout("/layouts/boilerplate") %>
 
-const schema = Joi.object({
-    username: Joi.string().alphanum().min(3).max(30).required(),
-    email: Joi.string().email().required(),
-    age: Joi.number().integer().min(18),
-});
-
-const { error, value } = schema.validate({
-    username: 'danilo',
-    email: 'danilo@example.com',
-    age: 28,
-});
+    <body>
+        <div class="row mt-3">
+            <div class="col-6 offset-3">
+                <div class="alert alert-danger" role="alert">
+                    <p><%= message %></p>
+                </div>
+            </div>
+        </div>
+    </body>

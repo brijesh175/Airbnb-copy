@@ -26,7 +26,7 @@
                 </li>
                 <li class="list-group-item">country : <%= place.country %>
                 </li>
-                <li class="list-group-item">&#8377 <%= place.price.toLocaleString("en-IN") %>/nigth</li>
+                <li class="list-group-item">&#8377 <%= place.price.toLocaleString("en-IN") %>/night</li>
             </ul>
             <br>
             <% if(curruser && place.owner._id.equals(curruser._id)){ %>
@@ -69,7 +69,7 @@
                                     <textarea name="review[comment]" id="comment" rows="5" cols="60"
                                         placeholder="add your review here" class="form-control" required></textarea>
                                     <div class="invalid-feedback">
-                                        write somthing before submit bkl.
+                                        Please write a comment before submitting.
                                     </div>
                                 </div>
                                 <br>
@@ -94,11 +94,13 @@
                                                     %>Stars</h6>
                                             <p class="starability-result" data-rating="<%=review.rating%>">
                                             </p>
+                                            <% if(curruser && review.author._id.equals(curruser._id)){ %>
                                             <form method="post"
                                                 action="/listing/<%=place._id%>/reviews/<%=review._id%>?_method=DELETE"
                                                 class="mb-3 ml-10">
                                                 <button class="btn btn-sm btn-dark">delete</button>
                                             </form>
+                                            <% } %>
                                         </div>
                                         <% } %>
                                 </div>
